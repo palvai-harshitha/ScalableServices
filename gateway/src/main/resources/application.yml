@@ -1,0 +1,40 @@
+server:
+  port: 8080
+  # Port on which the Spring Boot API Gateway runs
+
+jwt:
+  secret: my-secret-key-for-signing-jwt  # Secret key for signing JWT tokens (replace with a secure key)
+  expiration: 3600000  # JWT token expiration time in milliseconds (1 hour)
+  token-prefix: Bearer  # Prefix for JWT in Authorization header
+
+spring:
+  main:
+   web-application-type: reactive
+   allow-bean-definition-overriding: true
+  application:
+   name: my-spring-app
+  autoconfigure:
+   exclude: 
+     - org.springframework.boot.actuate.autoconfigure.observation.web.servlet.WebMvcObservationAutoConfiguration
+  security:
+    user:
+      name: user1  # Default username for basic authentication (optional)
+      password: password1  # Default password for basic authentication (optional)
+
+  cloud:
+    gateway:
+      routes:
+        - id: loginMS
+          uri: http://15.206.134.193:4005  # Microservice 1 URI
+          predicates:
+            - Path=/Users/**  # Path condition for routing requests to Microservice 1
+
+        - id: microservice-2
+          uri: http://15.206.134.193:4005  # Microservice 2 URI
+          predicates:
+            - Path=/auth/**  # Path condition for routing requests to Microservice 2
+
+logging:
+  level:
+    org.springframework.security: DEBUG  # Enables detailed logging for Spring Security (useful for debugging JWT authentication)
+    org.springframework.web: DEBUG  # Enables logging for Spring Web (useful for debugging the routing in Gateway)
